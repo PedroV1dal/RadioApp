@@ -4,6 +4,8 @@ import {
   Trash,
   PencilSimple,
   List,
+  Play,
+  Pause,
 } from "@phosphor-icons/react";
 import axios from "axios";
 
@@ -12,20 +14,26 @@ import { Radio } from "./assets/types/Radio";
 const App: React.FC = () => {
   const [radios, setRadios] = useState<Radio[]>([]);
   const [searchRadioOptions, setSearchRadioOptions] = useState(false);
+  const [currentPage, setCurrentPage] = useState(1);
+  const [totalRadios, setTotalRadios] = useState(0);
+  const [favoriteRadios, setFavoriteRadios] = useState<Radio[]>([]);
 
   useEffect(() => {
     const fetchRadios = async () => {
       try {
         const response = await axios.get(
-          "https://de1.api.radio-browser.info/json/stations/search?limit=10"
+          `https://de1.api.radio-browser.info/json/stations/search?limit=8&offset=${
+            (currentPage - 1) * 10
+          }`
         );
         setRadios(response.data);
+        setTotalRadios(response.headers["x-total-count"]);
       } catch (error) {
         console.log("Error fetching radios:", error);
       }
     };
     fetchRadios();
-  }, []);
+  }, [currentPage]);
 
   const handleSearchRadioOptions = () => {
     setSearchRadioOptions(true);
@@ -34,6 +42,25 @@ const App: React.FC = () => {
   const handleCloseMenu = () => {
     setSearchRadioOptions(false);
   };
+
+  const handleAddToFavorites = (radio: Radio) => {
+    const isAlreadyAdded = favoriteRadios.some(
+      (favRadio) => favRadio.stationuuid === radio.stationuuid
+    );
+
+    if (!isAlreadyAdded) {
+      setFavoriteRadios((prevFavorites) => [...prevFavorites, radio]);
+    }
+  };
+
+  const handlePreviousPage = () => {
+    setCurrentPage((prevPage) => prevPage - 1);
+  };
+
+  const handleNextPage = () => {
+    setCurrentPage((prevPage) => prevPage + 1);
+  };
+
 
   return (
     <>
@@ -51,31 +78,23 @@ const App: React.FC = () => {
             <p className="ml-2">Search Stations</p>
           </div>
         </div>
-        <div className="max-w-3xl mx-auto bg-white pt-2 pb-2 pl-4 pr-2 mt-3 flex">
-          <div className="w-12 h-12 bg-slate-700 rounded-full"></div>
-          <div className="flex justify-between w-full">
-            <div className="text-left ml-4">
-              <p className="text-lg font-bold">Nome da Rádio</p>
-              <p className="-mt-1">País</p>
-            </div>
-            <div className="flex items-center space-x-2">
-              <div>
-                <PencilSimple
-                  size={26}
-                  weight="fill"
-                  className="cursor-pointer"
-                />
+        {favoriteRadios.length > 0 && (
+          <div className="bg-bluishGray max-w-3xl mx-auto rounded mt-2">
+            {favoriteRadios.map((radio) => (
+              <div key={radio.stationuuid} className="mt-4 bg-white">
+                <div>
+                  <audio src={radio.url} controls />
+                </div>
+                <h3 className="card-title">{radio.name}</h3>
+                <p>{radio.country}</p>
               </div>
-              <div>
-                <Trash size={26} weight="fill" className="cursor-pointer" />
-              </div>
-            </div>
+            ))}
           </div>
-        </div>
+        )}
       </div>
 
       {searchRadioOptions && (
-        <div className="fixed top-0 left-0 w-72 h-screen bg-darkGray flex flex-col">
+        <div className="fixed top-0 left-0 w-96 h-screen bg-darkGray flex flex-col">
           <div className="ml-auto">
             <List
               size={42}
@@ -89,15 +108,41 @@ const App: React.FC = () => {
               name="text"
               id="text"
               placeholder="Search Here"
-              className="w-48 rounded-md pl-4"
+              className="w-72 rounded-md pl-4"
             />
           </div>
           <div className="mt-4">
             {radios.map((radio) => (
-              <div className="bg-bluishGray mt-4 w-52 pt-3 pb-3 pl-3 mx-auto" key={radio.stationuuid}>
-                <p className="text-white">{radio.name}</p>
+              <div
+                className="bg-bluishGray mt-4 w-80 pt-3 pb-3 pl-3 mx-auto"
+                key={radio.stationuuid}
+              >
+                <p className="text-white text-sm">{radio.name}</p>
+                <button
+                  className="text-white"
+                  onClick={() => handleAddToFavorites(radio)}
+                >
+                  Add to Favorites
+                </button>
               </div>
             ))}
+          </div>
+
+          <div className="fixed bottom-0 left-0 w-96 mb-3 bg-darkGray flex justify-center items-center mt-4">
+            <button
+              className="mr-2 px-4 py-2 rounded-md bg-intenseBlue text-white disabled:opacity-50"
+              onClick={handlePreviousPage}
+              disabled={currentPage === 1}
+            >
+              Previous
+            </button>
+            <button
+              className="ml-2 px-4 py-2 rounded-md bg-intenseBlue text-white disabled:opacity-50"
+              onClick={handleNextPage}
+              disabled={currentPage * 10 >= totalRadios}
+            >
+              Next
+            </button>
           </div>
         </div>
       )}
