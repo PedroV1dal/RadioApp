@@ -22,8 +22,7 @@ const App: React.FC = () => {
     const fetchRadios = async () => {
       try {
         const response = await axios.get(
-          `https://de1.api.radio-browser.info/json/stations/search?limit=8&offset=${
-            (currentPage - 1) * 10
+          `https://de1.api.radio-browser.info/json/stations/search?limit=8&offset=${(currentPage - 1) * 10
           }`
         );
         setRadios(response.data);
@@ -51,6 +50,12 @@ const App: React.FC = () => {
     if (!isAlreadyAdded) {
       setFavoriteRadios((prevFavorites) => [...prevFavorites, radio]);
     }
+  };
+
+  const handleRemoveFromFavorites = (radio: Radio) => {
+    setFavoriteRadios((prevFavorites) =>
+      prevFavorites.filter((favRadio) => favRadio.stationuuid !== radio.stationuuid)
+    );
   };
 
   const handlePreviousPage = () => {
@@ -81,12 +86,19 @@ const App: React.FC = () => {
         {favoriteRadios.length > 0 && (
           <div className="bg-bluishGray max-w-3xl mx-auto rounded mt-2">
             {favoriteRadios.map((radio) => (
-              <div key={radio.stationuuid} className="mt-4 bg-white">
-                <div>
-                  <audio src={radio.url} controls />
+              <div key={radio.stationuuid} className="mt-4 bg-white p-4 rounded">
+                <div className="flex items-center">
+                  <audio src={radio.url} controls className="mr-4" />
+                  <div>
+                    <h3 className="text-lg font-bold">{radio.name}</h3>
+                    <p className="text-sm">{radio.country}</p>
+                    <Trash
+                      size={20}
+                      className="text-red-500 cursor-pointer ml-auto"
+                      onClick={() => handleRemoveFromFavorites(radio)}
+                    />
+                  </div>
                 </div>
-                <h3 className="card-title">{radio.name}</h3>
-                <p>{radio.country}</p>
               </div>
             ))}
           </div>
