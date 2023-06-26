@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useState } from "react";
 import { List } from "@phosphor-icons/react";
 import { Radio } from "../types/Radio";
 
@@ -21,6 +21,9 @@ export const SearchMenu: React.FC<SearchMenuProps> = ({
   onNextPage,
   onCloseMenu,
 }) => {
+
+  const [searchValue, setSearchValue] = useState("");
+
   const handleAddToFavorites = (radio: Radio) => {
     onAddToFavorites(radio);
   };
@@ -36,6 +39,18 @@ export const SearchMenu: React.FC<SearchMenuProps> = ({
   const handleCloseMenu = () => {
     onCloseMenu();
   };
+
+  const handleSearchChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+    setSearchValue(event.target.value);
+  };
+
+  // Filtra a lista de rádios com base no valor da pesquisa
+  const filteredRadios = radios.filter(
+    (radio) =>
+      radio.name.toLowerCase().includes(searchValue.toLowerCase()) ||
+      radio.country.toLowerCase().includes(searchValue.toLowerCase())
+  );
+
 
   return (
     <div className="fixed top-0 left-0 w-96 h-screen bg-darkGray flex flex-col">
@@ -53,12 +68,14 @@ export const SearchMenu: React.FC<SearchMenuProps> = ({
           id="text"
           placeholder="Search Here"
           className="w-72 rounded-md pl-4"
+          value={searchValue}
+          onChange={handleSearchChange}
         />
       </div>
       <div className="mt-4">
-        {radios.map((radio) => (
+        {filteredRadios.map((radio) => (
           <div
-            className="bg-bluishGray mt-4 w-80 pt-3 pb-3 pl-3 mx-auto"
+            className="bg-bluishGray pt-3 pb-3 mt-3 w-80 mx-auto rounded-md pl-3"
             key={radio.stationuuid}
           >
             <p className="text-white text-sm">{radio.name}</p>
