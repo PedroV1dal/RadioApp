@@ -12,7 +12,7 @@ Este é um projeto de exemplo de uma aplicação de rádio online, onde os usuá
   ```
 
 
-3. **Executando a aplicação**
+2. **Executando a aplicação**
 
 Para executar a aplicação, utilize o seguinte comando:
 ```
