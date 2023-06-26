@@ -42,6 +42,11 @@ Para remover uma rádio dos favoritos, clique no ícone de lixeira ao lado do no
 - axios
 - @phosphor-icons/react
 
+### Aplicativo por Dentro
+
+
+
+
 ### Contribuição
 
 Contribuições são bem-vindas! Se você quiser contribuir com este projeto, sinta-se à vontade para fazer um fork e enviar uma pull request.
