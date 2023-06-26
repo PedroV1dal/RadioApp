@@ -44,8 +44,9 @@ Para remover uma rádio dos favoritos, clique no ícone de lixeira ao lado do no
 
 ### Aplicativo por Dentro
 
-
-
+![PáginaInicial](public/App.png)
+![ÁreaDePesquisa](public/Search.png.png)
+![RadiosFavoritas](public/Favorite.png.png)
 
 ### Contribuição
 
